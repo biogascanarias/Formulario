@@ -134,16 +134,13 @@ const SEC=[
 {k:"Necesidades de calor o frío",t:"chk",o:["Agua caliente","Vapor","Secado","Refrigeración","Ninguna"]}]},
 {t:"5. Instalación y objetivos",f:[{k:"Espacio disponible para una planta",t:"sel",o:["Menos de 100 m²","100–500 m²","Más de 500 m²","No lo sé"]},{k:"¿Podrías aprovechar el digestato como abono en tu finca?",t:"sel",o:SN},{k:"Plazo en el que te planteas actuar",t:"sel",o:["Menos de 6 meses","6–12 meses","Más de 12 meses","Solo me estoy informando"]},
 {k:"Qué te interesa conseguir",t:"chk",o:["Reducir el coste de gestión","Ahorrar energía","Cumplir la normativa","Producir fertilizante","Acceder a subvenciones"]},{k:"Comentarios",t:"area",w:1}]}];
-const TIPOS='<optgroup label="Ganadero"><option>Purín de cerdo</option><option>Purín de vacuno</option><option>Estiércol sólido de vacuno</option><option>Estiércol de cabra u oveja</option><option>Gallinaza</option></optgroup><optgroup label="Agroalimentario y otros"><option>Aloe vera</option><option>Suero de queso (cabra, vaca u oveja)</option><option>Descartes de fruta y hortaliza</option><option>Bagazo de cervecería</option><option>Residuos de bodega</option><option>Restos de panadería y repostería</option><option>Lodos de flotación y grasas</option><option>Contenido ruminal y restos de matadero</option><option>Biorresiduos de hostelería</option><option>Otro</option></optgroup>';
 const RES=`<div class="ri-box"><div class="rh"><b class="rt"></b><button type="button" class="x rm" aria-label="Quitar residuo">×</button></div><div class="g2">
-<label>Tipo de residuo *<select class="r-tipo" required><option value="">Selecciona…</option>${TIPOS}</select></label>
-<label class="r-otro" hidden>¿Cuál? *<input class="r-ot" type="text"></label>
+<label class="wide">Tipo de residuo *<input class="r-tipo" type="text" required placeholder="Ej. purín de cerdo, suero de queso, aloe vera…"></label>
 <label>Cantidad aproximada *<input class="r-q" type="number" min="0" step="any" inputmode="decimal" required></label>
 <label>Unidad<select class="r-u"><option>t/mes</option><option>t/año</option><option>m³/mes</option><option>m³/año</option></select></label>
 <label>Periodicidad<select class="r-p"><option>Continua (todo el año)</option><option>Semanal</option><option>Estacional</option><option>Puntual</option></select></label>
 <label class="r-mes" hidden>Meses de generación<input class="r-m" type="text" placeholder="Ej. junio a septiembre"></label>
 <label>Estado<select class="r-e"><option>Líquido</option><option>Pastoso</option><option>Sólido</option></select></label>
-<label>¿Tienes análisis (sólidos, DQO…)?<select class="r-a"><option>No lo sé</option><option>Sí</option><option>No</option></select></label>
 <label>Gestión actual<select class="r-g"><option>Gestor autorizado</option><option>Aplicación en finca</option><option>Compostaje</option><option>Vertedero</option><option>Otra</option></select></label>
 <label>Coste de gestión (opcional)<input class="r-c" type="text" placeholder="Ej. 25 €/t o 3.000 €/año"></label></div></div>`;
 let n=0;const ids={},DEPS=[];
@@ -168,7 +165,6 @@ $("addr").onclick=addRes;
 document.addEventListener("click",e=>{if(e.target.classList.contains("rm")){e.target.closest(".ri-box").remove();renum();}});
 document.addEventListener("change",e=>{
   const t=e.target,b=t.closest(".ri-box");
-  if(t.classList.contains("r-tipo")){const l=b.querySelector(".r-otro");l.hidden=t.value!=="Otro";l.querySelector("input").required=!l.hidden;}
   if(t.classList.contains("r-p"))b.querySelector(".r-mes").hidden=t.value!=="Estacional";
   dep();
 });
@@ -180,8 +176,8 @@ $("f").addEventListener("submit",async e=>{
   e.preventDefault();
   const st=$("status"),b=$("go"),d=collect();
   const items=[...document.querySelectorAll(".ri-box")].map((x,i)=>{const v=c=>x.querySelector(c).value.trim();
-    const tipo=v(".r-tipo")==="Otro"?"Otro: "+v(".r-ot"):v(".r-tipo");
-    return `Residuo ${i+1}: ${tipo}; ${v(".r-q")} ${v(".r-u")}; ${v(".r-p")}${v(".r-m")?" ("+v(".r-m")+")":""}; estado ${v(".r-e").toLowerCase()}; análisis: ${v(".r-a")}; gestión: ${v(".r-g")}${v(".r-c")?" ("+v(".r-c")+")":""}`;});
+    const tipo=v(".r-tipo");
+    return `Residuo ${i+1}: ${tipo}; ${v(".r-q")} ${v(".r-u")}; ${v(".r-p")}${v(".r-m")?" ("+v(".r-m")+")":""}; estado ${v(".r-e").toLowerCase()}; gestión: ${v(".r-g")}${v(".r-c")?" ("+v(".r-c")+")":""}`;});
   const mail=d["Correo electrónico"];delete d["Correo electrónico"];d.Residuos=items.join("\n");
   const emp=d.Empresa||"";
   b.disabled=true;b.textContent="Enviando…";st.textContent="";
